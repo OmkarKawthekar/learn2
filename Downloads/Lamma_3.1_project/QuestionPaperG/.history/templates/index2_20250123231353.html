@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Question Paper Generator</title>
+    <script>
+        let units = [];
+
+        // Add Unit Form
+        function addUnit() {
+            const unitCount = units.length + 1;
+            units.push({ id: unitCount, questions: [] });
+
+            const unitDiv = document.createElement("div");
+            unitDiv.id = `unit-${unitCount}`;
+            unitDiv.innerHTML = `
+                <h3>Unit ${unitCount}</h3>
+                <label>Marks for this unit:</label>
+                <input type="number" id="unit-${unitCount}-marks" placeholder="Enter marks" required>
+                <button type="button" onclick="addQuestion(${unitCount})">Add Question Type</button>
+                <div id="unit-${unitCount}-questions"></div>
+            `;
+            document.getElementById("units-container").appendChild(unitDiv);
+        }
+
+        // Add Question Type for a Unit
+        function addQuestion(unitId) {
+            const questionDiv = document.createElement("div");
+            questionDiv.innerHTML = `
+                <label>Marks per question:</label>
+                <input type="number" class="question-marks" placeholder="Enter marks" required>
+                <label>Number of questions:</label>
+                <input type="number" class="question-count" placeholder="Enter count" required>
+            `;
+            document.getElementById(`unit-${unitId}-questions`).appendChild(questionDiv);
+        }
+
+        // Collect Data and Submit
+        function generateQuestionPaper() {
+            const totalMarks = document.getElementById("total-marks").value;
+            if (!totalMarks) {
+                alert("Please enter total marks!");
+                return;
+            }
+
+            const unitDetails = [];
+            units.forEach((unit) => {
+                const unitMarks = document.getElementById(`unit-${unit.id}-marks`).value;
+                if (!unitMarks) {
+                    alert(`Please enter marks for Unit ${unit.id}`);
+                    return;
+                }
+
+                const questions = {};
+                const questionDivs = document.querySelectorAll(`#unit-${unit.id}-questions div`);
+                questionDivs.forEach((div) => {
+                    const marks = div.querySelector(".question-marks").value;
+                    const count = div.querySelector(".question-count").value;
+                    if (marks && count) {
+                        questions[marks] = parseInt(count, 10);
+                    }
+                });
+
+                unitDetails.push({ unit: `Unit ${unit.id}`, questions });
+            });
+
+            const data = {
+                total_marks: parseInt(totalMarks, 10),
+                unit_details: unitDetails,
+            };
+
+            fetch("/generate-qp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            })
+                .then((response) => response.json())
+                .then((result) => {
+                    if (result.error) {
+                        alert(result.error);
+                    } else {
+                        alert(result.message);
+                        window.location.href = result.download_url;
+                    }
+                })
+                .catch((error) => console.error("Error:", error));
+        }
+    </script>
+</head>
+<body>
+    <h1>Custom Question Paper Generator</h1>
+    <form onsubmit="event.preventDefault(); generateQuestionPaper();">
+        <label>Total Marks:</label>
+        <input type="number" id="total-marks" placeholder="Enter total marks" required>
+        <button type="button" onclick="addUnit()">Add Unit</button>
+        <div id="units-container"></div>
+        <br>
+        <button type="submit">Generate Question Paper</button>
+    </form>
+</body>
+</html>

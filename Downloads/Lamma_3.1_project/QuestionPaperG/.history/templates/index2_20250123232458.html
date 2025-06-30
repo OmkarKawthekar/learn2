@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Paper Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+        }
+        input, button, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .unit-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        let units = [];
+
+        // Add Unit Form
+        function addUnit() {
+            const unitCount = units.length + 1;
+            units.push({ id: unitCount, questions: [] });
+
+            const unitDiv = document.createElement("div");
+            unitDiv.id = `unit-${unitCount}`;
+            unitDiv.className = "unit-container";
+            unitDiv.innerHTML = `
+                <h3>Unit ${unitCount}</h3>
+                <label>Marks for this unit:</label>
+                <input type="number" id="unit-${unitCount}-marks" placeholder="Enter total marks for the unit" required>
+                <button type="button" onclick="addQuestion(${unitCount})">Add Question Type</button>
+                <div id="unit-${unitCount}-questions"></div>
+            `;
+            document.getElementById("units-container").appendChild(unitDiv);
+        }
+
+        // Add Question Type for a Unit
+        function addQuestion(unitId) {
+            const questionDiv = document.createElement("div");
+            questionDiv.className = "form-group";
+            questionDiv.innerHTML = `
+                <label>Marks per question:</label>
+                <input type="number" class="question-marks" placeholder="Enter marks per question" required>
+                <label>Number of questions:</label>
+                <input type="number" class="question-count" placeholder="Enter number of questions" required>
+            `;
+            document.getElementById(`unit-${unitId}-questions`).appendChild(questionDiv);
+        }
+
+        // Handle Question Generation
+        function generateQuestions() {
+            const syllabusFile = document.getElementById("syllabus-file").files[0];
+            if (!syllabusFile) {
+                alert("Please upload a syllabus file!");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("syllabus", syllabusFile);
+
+            fetch("/generate-questions", {
+                method: "POST",
+                body: formData,
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch((error) => console.error("Error:", error));
+        }
+
+        // Handle Question Paper Generation
+        function generateQuestionPaper() {
+            const totalMarks = document.getElementById("total-marks").value;
+            if (!totalMarks) {
+                alert("Please enter the total marks!");
+                return;
+            }
+
+            const unitDetails = [];
+            units.forEach((unit) => {
+                const unitMarks = document.getElementById(`unit-${unit.id}-marks`).value;
+                if (!unitMarks) {
+                    alert(`Please enter marks for Unit ${unit.id}`);
+                    return;
+                }
+
+                const questions = {};
+                const questionDivs = document.querySelectorAll(`#unit-${unit.id}-questions .form-group`);
+                questionDivs.forEach((div) => {
+                    const marks = div.querySelector(".question-marks").value;
+                    const count = div.querySelector(".question-count").value;
+                    if (marks && count) {
+                        questions[marks] = parseInt(count, 10);
+                    }
+                });
+
+                unitDetails.push({ unit: `Unit ${unit.id}`, questions });
+            });
+
+            const data = {
+                total_marks: parseInt(totalMarks, 10),
+                unit_details: unitDetails,
+            };
+
+            fetch("/generate-qp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            })
+                .then((response) => response.json())
+                .then((result) => {
+                    if (result.error) {
+                        alert(result.error);
+                    } else {
+                        alert(result.message);
+                        window.location.href = result.download_url;
+                    }
+                })
+                .catch((error) => console.error("Error:", error));
+        }
+    </script>
+</head>
+<body>
+    <h1>Custom Question Paper Generator</h1>
+
+    <!-- Upload Syllabus -->
+    <div class="form-group">
+        <label for="syllabus-file">Upload Syllabus PDF:</label>
+        <input type="file" id="syllabus-file" accept="application/pdf" required>
+        <button type="button" onclick="generateQuestions()">Generate Questions</button>
+    </div>
+
+    <!-- Total Marks -->
+    <div class="form-group">
+        <label for="total-marks">Total Marks:</label>
+        <input type="number" id="total-marks" placeholder="Enter total marks" required>
+    </div>
+
+    <!-- Add Units -->
+    <button type="button" onclick="addUnit()">Add Unit</button>
+    <div id="units-container"></div>
+
+    <!-- Generate Question Paper -->
+    <button type="button" onclick="generateQuestionPaper()">Generate Question Paper</button>
+</body>
+</html>

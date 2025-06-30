@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Question Generator</title>
+    <style>
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes typewriter {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        @keyframes shine {
+            0% { background-position: -100px; }
+            60% { background-position: 300px; }
+            100% { background-position: 300px; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 1000px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            position: relative;
+            animation: float 5s ease-in-out infinite;
+            transition: all 0.3s ease;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero-image {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 2rem;
+            animation: floating 6s ease-in-out infinite;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 3.5rem;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: slideUp 1s ease forwards;
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .typing-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .typing-text {
+            color: #666;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            position: relative;
+            width: 0;
+            max-width: fit-content;
+            margin: 0 auto;
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typewriter 4s steps(50) 1s forwards;
+        }
+
+        .typing-text::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+
+        form {
+            display: grid;
+            gap: 2.5rem;
+            margin-top: 4rem;
+            opacity: 0;
+            animation: slideUp 1s ease 0.5s forwards;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        label {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: block;
+            font-size: 1.1rem;
+        }
+
+        .file-upload-label {
+            background: rgba(52, 152, 219, 0.1);
+            border: 3px dashed #3498db;
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-upload-label:hover {
+            transform: scale(1.02);
+            background: rgba(52, 152, 219, 0.2);
+        }
+
+        .file-upload-label::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 20%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        .file-name {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 1.5rem;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            min-height: 150px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        button {
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            color: white;
+            border: none;
+            padding: 1.5rem 3rem;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform-origin: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .loader {
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin-left: 10px;
+        }
+
+        .loading .loader {
+            display: inline-block;
+        }
+
+        .results {
+            margin-top: 3rem;
+            padding: 2rem;
+            border-radius: 20px;
+            background: rgba(248, 249, 250, 0.9);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        .results.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .results h3 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+
+        .results ol {
+            padding-left: 1.5rem;
+            color: #666;
+        }
+
+        .results li {
+            margin-bottom: 1rem;
+        }
+
+        .download-links {
+            margin-top: 3rem;
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .download-links a {
+            background: linear-gradient(45deg, #2ecc71, #3498db);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            transform-origin: center;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .download-links a:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .error {
+            color: #e74c3c;
+            background: #fdf1f0;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            text-align: center;
+            animation: slideUp 0.5s ease;
+        }
+
+        .success {
+            color: #27ae60;
+            background: #eafaf1;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            text-align: center;
+            animation: slideUp 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            body { 
+                padding: 1rem; 
+            }
+            .container { 
+                padding: 2rem; 
+            }
+            h1 { 
+                font-size: 2.5rem; 
+            }
+            .hero-image { 
+                width: 150px; 
+                height: 150px; 
+            }
+            .typing-text {
+                font-size: 1rem;
+            }
+            button {
+                padding: 1.2rem 2rem;
+                font-size: 1.1rem;
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero-section">
+            <svg viewBox="0 0 200 200" class="hero-image" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#3498db;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#2ecc71;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                
+                <!-- Outer circle with gradient -->
+                <circle cx="100" cy="100" r="90" fill="none" stroke="url(#gradient)" stroke-width="8">
+                    <animate attributeName="stroke-dasharray" from="0 565.48" to="565.48 565.48" dur="2s" />
+                    <animateTransform attributeName="transform" type="rotate" from="0 100 100" to="360 100 100" dur="20s" repeatCount="indefinite" />
+                </circle>
+                
+                <!-- Question mark -->
+                <path d="M85 140 L85 160 L115 160 L115 140 Z M85 60 C85 40 115 40 115 60 L115 80 C115 90 100 90 100 100 L100 120" 
+                      fill="none" 
+                      stroke="url(#gradient)" 
+                      stroke-width="12" 
+                      stroke-linecap="round">
+                    <animate attributeName="stroke-dasharray" from="0 300" to="300 300" dur="2s" />
+                </path>
+                
+                <!-- Dots animation -->
+                <circle cx="70" cy="70" r="4" fill="#3498db">
+                    <animate attributeName="r" values="4;6;4" dur="2s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="130" cy="70" r="4" fill="#2ecc71">
+                    <animate attributeName="r" values="4;6;4" dur="2s" repeatCount="indefinite" begin="0.5s" />
+                </circle>
+            </svg>
+            <h1>Smart Question Generator</h1>
+            <div class="typing-container">
+                <p class="typing-text">Transform your syllabus into intelligent questions with AI ✨</p>
+            </div>
+        </div>
+
+        <form id="syllabus-form" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="syllabus">Upload Syllabus (PDF)</label>
+                <input type="file" id="syllabus" name="syllabus" accept=".pdf" required style="display: none;">
+                <label for="syllabus" class="file-upload-label">
+                    <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    <p>Drop your PDF here or click to browse</p>
+                    <div class="file-name"></div>
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label for="base_prompt">Base Prompt</label>
+                <textarea 
+                    id="base_prompt" 
+                    name="base_prompt" 
+                    placeholder="Enter your instructions for question generation here... For example: Generate conceptual questions focusing on key theories and their applications." 
+                    required
+                ></textarea>
+            </div>
+            
+            <button type="submit">
+                Generate Questions
+                <div class="loader"></div>
+                <span>✨</span>
+            </button>
+        </form>
+        
+        <div id="results" class="results"></div>
+        
+        <div id="generate-papers-container" class="generate-papers-container">
+            <button id="generate-papers" disabled>
+                Generate Question Papers
+                <div class="loader"></div>
+                <span>📝</span>
+            </button>
+        </div>
+        
+        <div id="download-links" class="download-links"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('syllabus-form');
+            const fileInput = document.getElementById('syllabus');
+            const fileLabel = document.querySelector('.file-upload-label');
+            const fileName = document.querySelector('.file-name');
+            const resultsDiv = document.getElementById('results');
+            const generatePapersBtn = document.getElementById('generate-papers');
+            const downloadLinksDiv = document.getElementById('download-links');
+
+            // File upload handling
+            fileInput.addEventListener('change', function(e) {
+                if (this.files[0]) {
+                    fileName.textContent = this.files[0].name;
+                } else {
+                    fileName.textContent = '';
+                }
+            });
+
+            // Drag and drop functionality
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                fileLabel.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                fileLabel.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                fileLabel.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight() {
+                fileLabel.classList.add('dragover');
+            }
+
+            function unhighlight() {
+                fileLabel.classList.remove('dragover');
+            }
+
+            fileLabel.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+
+                fileInput.files = files;
+                if (files[0]) {
+                    fileName.textContent = files[0].name;
+                }
+            }
+
+            // Form submission handling
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const submitButton = this.querySelector('button[type="submit"]');
+                
+                // Show loading state
+                submitButton.classList.add('loading');
+                submitButton.disabled = true;
+                resultsDiv.innerHTML = '';
+                resultsDiv.classList.remove('show');
+                generatePapersBtn.disabled = true;
+
+                // Display loading indicator
+                const loader = submitButton.querySelector('.loader');
+                loader.style.display = 'inline-block';
+
+                fetch('/generate-questions', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    resultsDiv.classList.add('show');
+                    
+                    if (data.message) {
+                        let htmlContent = `<div class="success">${data.message}</div>`;
+
+                        if (data.units && Array.isArray(data.units) && data.units.length > 0) {
+                            htmlContent += `
+                                <h3>Units Processed:</h3>
+                                <ol>
+                                    ${data.units.map(unit => `<li>${unit}</li>`).join('')}
+                                </ol>
+                            `;
+                        }
+
+                        resultsDiv.innerHTML = htmlContent;
+                        generatePapersBtn.disabled = false;
+                    } else if (data.error) {
+                        resultsDiv.innerHTML = `<div class="error">Error: ${data.error}</div>`;
+                    }
+                })
+                .catch(error => {
+                    resultsDiv.classList.add('show');
+                    const errorMessage = error.error || error.message || 'Unknown error occurred.';
+                    resultsDiv.innerHTML = `<div class="error">Error: ${errorMessage}</div>`;
+                })
+                .finally(() => {
+                    // Hide loading state
+                    submitButton.classList.remove('loading');
+                    submitButton.disabled = false;
+                    loader.style.display = 'none';
+                });
+            });
+
+            // Generate papers button handling
+            generatePapersBtn.addEventListener('click', function() {
+                this.classList.add('loading');
+                this.disabled = true;
+                downloadLinksDiv.innerHTML = '';
+                downloadLinksDiv.classList.remove('show');
+
+                // Display loading indicator
+                const loader = this.querySelector('.loader');
+                loader.style.display = 'inline-block';
+
+                fetch('/generate-papers')
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    downloadLinksDiv.classList.add('show');
+
+                    if (data.papers && Array.isArray(data.papers) && data.papers.length > 0) {
+                        const successMsg = document.createElement('div');
+                        successMsg.className = 'success';
+                        successMsg.textContent = data.message || "Question papers generated successfully!";
+                        downloadLinksDiv.appendChild(successMsg);
+
+                        data.papers.forEach((paper, index) => {
+                            const link = document.createElement('a');
+                            link.href = `/download/${encodeURIComponent(paper)}`;
+                            link.innerHTML = `
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                Question Paper ${index + 1}
+                            `;
+                            link.download = paper;
+                            downloadLinksDiv.appendChild(link);
+                        });
+                    } else if (data.error) {
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'error';
+                        errorDiv.textContent = data.error;
+                        downloadLinksDiv.appendChild(errorDiv);
+                    }
+                })
+                .catch(error => {
+                    downloadLinksDiv.classList.add('show');
+                    const errorMessage = error.error || error.message || 'An unexpected error occurred.';
+                    downloadLinksDiv.innerHTML = `<div class="error">Error: ${errorMessage}</div>`;
+                })
+                .finally(() => {
+                    // Hide loading state
+                    this.classList.remove('loading');
+                    this.disabled = false;
+                    const loader = this.querySelector('.loader');
+                    loader.style.display = 'none';
+                });
+            });
+
+            // Helper function to show error messages
+            function showError(container, message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error';
+                errorDiv.textContent = message;
+                container.innerHTML = '';
+                container.appendChild(errorDiv);
+                container.classList.add('show');
+            }
+
+            // File type and size validation
+            fileInput.addEventListener('change', function(e) {
+                const file = this.files[0];
+                if (file) {
+                    if (file.type !== 'application/pdf') {
+                        showError(resultsDiv, 'Please upload a PDF file.');
+                        this.value = '';
+                        fileName.textContent = '';
+                        return;
+                    } else if (file.size > 10 * 1024 * 1024) { // 10MB limit
+                        showError(resultsDiv, 'File size should be less than 10MB.');
+                        this.value = '';
+                        fileName.textContent = '';
+                        return;
+                    } else {
+                        fileName.textContent = file.name;
+                        resultsDiv.innerHTML = '';
+                        resultsDiv.classList.remove('show');
+                    }
+                }
+            });
+
+            // Textarea character limit and validation
+            const textarea = document.getElementById('base_prompt');
+            const maxLength = 500; // Maximum characters allowed
+
+            textarea.addEventListener('input', function() {
+                if (this.value.length > maxLength) {
+                    this.value = this.value.slice(0, maxLength);
+                }
+            });
+
+            // Initialize tooltips for buttons
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    if (this.disabled) {
+                        this.title = 'Please generate questions first';
+                    } else {
+                        this.removeAttribute('title');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
